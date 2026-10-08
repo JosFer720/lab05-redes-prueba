@@ -1,0 +1,68 @@
+services:
+  dns:
+    build:
+      context: ./dns
+      extra_hosts: ["ports.ubuntu.com=91.189.92.19"]
+    container_name: lab05-all-dns
+    networks: {lab: {ipv4_address: 172.30.0.53}}
+    ports: ["5353:53/tcp", "5353:53/udp"]
+  ldap:
+    build:
+      context: ./ldap
+      extra_hosts: ["ports.ubuntu.com=91.189.92.19"]
+    container_name: lab05-all-ldap
+    networks: {lab: {ipv4_address: 172.30.0.11}}
+    ports: ["1389:389"]
+  web:
+    build:
+      context: ..
+      dockerfile: integration/web/Dockerfile
+      extra_hosts: ["ports.ubuntu.com=91.189.92.19"]
+    container_name: lab05-all-web
+    depends_on: [ldap]
+    networks: {lab: {ipv4_address: 172.30.0.12}}
+    dns: [172.30.0.53]
+    ports: ["8080:80"]
+  mail:
+    build:
+      context: ..
+      dockerfile: integration/mail/Dockerfile
+      extra_hosts: ["ports.ubuntu.com=91.189.92.19"]
+    container_name: lab05-all-mail
+    depends_on: [ldap]
+    networks: {lab: {ipv4_address: 172.30.0.13}}
+    dns: [172.30.0.53]
+    ports: ["2525:25", "1587:587", "1143:143"]
+  ftp:
+    image: ftp-ftp:latest
+    container_name: lab05-all-ftp
+    environment: {FTP_USER: ftpuser, FTP_PASSWORD: Lab5-ftp, PASV_ADDRESS: 172.30.0.14}
+    entrypoint: ["/usr/local/bin/ftp-entrypoint"]
+    networks: {lab: {ipv4_address: 172.30.0.14}}
+  client:
+    build:
+      context: ..
+      dockerfile: integration/client/Dockerfile
+      extra_hosts: ["ports.ubuntu.com=91.189.92.19"]
+    container_name: lab05-all-client
+    depends_on: [dns, ldap, web, mail, ftp]
+    networks: {lab: {ipv4_address: 172.30.0.20}}
+    dns: [172.30.0.53]
+    environment:
+      DNS_SERVER: 172.30.0.53
+      LDAP_USER: usuario1
+      LDAP_PASSWORD: ClaveUsuario1
+      WEB_USER: usuario1
+      WEB_PASSWORD: ClaveUsuario1
+      MAIL_USER: usuario1
+      MAIL_PASSWORD: ClaveUsuario1
+      MAIL_RECIPIENT: usuario2@aerolinea.redes.test
+      MAIL_RECIPIENT_USER: usuario2
+      MAIL_RECIPIENT_PASSWORD: ClaveUsuario2
+      FTP_USER: ftpuser
+      FTP_PASSWORD: Lab5-ftp
+    command: sleep infinity
+networks:
+  lab:
+    ipam:
+      config: [{subnet: 172.30.0.0/24}]

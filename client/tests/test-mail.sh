@@ -31,7 +31,7 @@ message_received() {
   curl --fail --silent --show-error \
     --user "${MAIL_RECIPIENT_USER}:${MAIL_RECIPIENT_PASSWORD}" \
     --request 'SEARCH SUBJECT "Prueba interna"' \
-    "imap://${MAIL_HOST}/INBOX" | grep -q 'SEARCH'
+    "imap://${MAIL_HOST}/INBOX" | grep -Eq 'SEARCH[[:space:]]+[0-9]'
 }
 
 check MAIL-01 'resolución y MX' bash -c "[[ -n \$(dig +short '${MAIL_HOST}' A) ]] && dig +short '${DOMAIN}' MX | grep -q 'mail.${DOMAIN}'"
