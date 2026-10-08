@@ -2,6 +2,11 @@
 
 Repositorio de configuración y evidencias para `aerolinea.redes.test`.
 
+La relación entre los servidores está documentada en
+[`docs/diagramas/arquitectura.md`](docs/diagramas/arquitectura.md).
+El orden de despliegue y los puertos están en
+[`docs/puesta-en-marcha.md`](docs/puesta-en-marcha.md).
+
 ## Estructura
 
 ```text
@@ -33,6 +38,18 @@ Desde el cliente:
 ```bash
 WEB_USER='usuario' WEB_PASSWORD='clave-ldap' ./client/tests/test-web.sh
 ```
+
+## DNS, LDAP y correo
+
+Cada servicio incluye configuración, instalador, verificación local y prueba
+desde el cliente:
+
+- [`dns/README.md`](dns/README.md)
+- [`ldap/README.md`](ldap/README.md)
+- [`mail/README.md`](mail/README.md)
+
+Para probar todo junto se usa `client/tests/test-all.sh` con las variables de
+`shared/lab.example.env`.
 
 ## FTP
 

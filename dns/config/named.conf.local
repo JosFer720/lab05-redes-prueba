@@ -1,0 +1,4 @@
+zone "DOMAIN" {
+    type master;
+    file "/etc/bind/zones/db.DOMAIN";
+};
